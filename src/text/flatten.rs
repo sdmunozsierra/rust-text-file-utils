@@ -1,30 +1,46 @@
 pub fn flatten_text(text: &str) -> String {
     let mut flattened = String::new();
     let mut buffer = String::new();
+    let mut last_char_was_comma = false;
+    let mut needs_space = false;
 
     for line in text.lines() {
         let trimmed_line = line.trim();
         if !trimmed_line.is_empty() {
-            // If buffer is not empty, add a space before appending new trimmed line
-            if !buffer.is_empty() {
-                buffer.push(' ');
+            if !buffer.is_empty() && !last_char_was_comma {
+                needs_space = true;
             }
-            buffer.push_str(trimmed_line);
+            for ch in trimmed_line.chars() {
+                if ch == ',' {
+                    buffer.push(ch);
+                    last_char_was_comma = true;
+                    needs_space = false;
+                } else {
+                    if needs_space {
+                        buffer.push(' ');
+                        needs_space = false;
+                    }
+                    buffer.push(ch);
+                    last_char_was_comma = false;
+                }
+            }
 
-            // Check for sentence-ending punctuation
-            if trimmed_line.ends_with('.') || trimmed_line.ends_with('!') || trimmed_line.ends_with('?') {
+            if trimmed_line.ends_with('.')
+                || trimmed_line.ends_with('!')
+                || trimmed_line.ends_with('?')
+            {
                 if !flattened.is_empty() {
                     flattened.push('\n');
                 }
                 flattened.push_str(&buffer);
                 buffer.clear();
-            } else if trimmed_line.ends_with(',') {
-                buffer.push(' ');
+            } else {
+                needs_space = true;
             }
         }
     }
 
-    // Append any remaining buffer content if there's no ending period
+    // Append any remaining buffer content if there's no ending punctuation
     if !buffer.is_empty() {
         if !flattened.is_empty() {
             flattened.push('\n');
@@ -34,4 +50,3 @@ pub fn flatten_text(text: &str) -> String {
 
     flattened
 }
-
