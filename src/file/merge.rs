@@ -7,7 +7,7 @@ pub fn merge_files(output: &str, inputs: &[&str]) -> io::Result<()> {
         let mut input_file = File::open(input)?;
         let mut buffer = Vec::new();
         input_file.read_to_end(&mut buffer)?;
-        output_file.write_all(&buffer);
+        output_file.write_all(&buffer)?;
     }
     Ok(())
 }

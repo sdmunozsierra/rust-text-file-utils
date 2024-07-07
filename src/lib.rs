@@ -1,5 +1,5 @@
-pub mod text;
 pub mod file;
+pub mod text;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
