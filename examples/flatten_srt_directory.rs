@@ -1,11 +1,11 @@
 use rust_text_file_utils::file::read::read_files_sequentially;
 use rust_text_file_utils::parser::srt::{self, OutputFormat};
-use rust_text_file_utils::text::flatten::flatten_text;
 use rust_text_file_utils::text::clean::clean_title;
+use rust_text_file_utils::text::flatten::flatten_text;
 
 fn main() {
     // Specify the directory containing the SRT files
-    let test_dir = "/home/adminlenovo/Data/Documents/udacity_lesson_1";
+    let test_dir = "/home/adminlenovo/Data/Learning/Udacity/Introduction_to_LLMs/1_GenAI";
 
     // Read all SRT files in the specified directory
     let result = read_files_sequentially(test_dir, "srt");
