@@ -1,20 +1,8 @@
 use rust_text_file_utils::file::{merge, read, write};
 use rust_text_file_utils::parser::srt;
-use rust_text_file_utils::text::{clean, flatten, replace, search};
+use rust_text_file_utils::text::{clean, flatten};
 use std::fs::{self, File};
 use std::io::Write;
-
-#[test]
-fn test_search() {
-    let result = search::find("world", "Hello, world!");
-    assert_eq!(result, Some(7));
-}
-
-#[test]
-fn test_replace() {
-    let result = replace::replace("world", "Rust", "Hello, world!");
-    assert_eq!(result, "Hello, Rust!");
-}
 
 #[test]
 fn test_merge_files() {

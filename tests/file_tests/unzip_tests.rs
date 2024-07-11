@@ -1,13 +1,17 @@
-use std::fs::{self, File};
-use std::path::Path;
-    use std::io::Write;
-    use tokio::runtime::Runtime;
 use rust_text_file_utils::file::unzip;
-    
+use std::fs::{self, File};
+use std::io::Write;
+use std::path::Path;
+use tokio::runtime::Runtime;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
     #[test]
     fn test_unzip_file() {
         let rt = Runtime::new().unwrap();
-        
+
         // Create a sample zip file for testing
         let zip_path = "test.zip";
         let dest_dir = "test_output";
@@ -36,3 +40,4 @@ use rust_text_file_utils::file::unzip;
         fs::remove_file(zip_path).unwrap();
         fs::remove_dir_all(dest_dir).unwrap();
     }
+}
