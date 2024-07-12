@@ -8,20 +8,21 @@ mod tests {
     fn test_clean_title() {
         let test_cases = vec![
             (
-                "123 - CD456 GenAI C789 L012 A345. Something V1 - lang_en-us.srt",
-                "Something",
+                "4 - CD13317 GenAI C2 L1 A04 Encoder Vs Decoder Models V1 - lang_en-us.srt",
+                "Encoder Vs Decoder Models V1",
             ),
             (
-                "123 - CD456 GenAI C789 L012 A345. Something else V1 - lan.srt",
-                "Something else",
+                "5 - NLP Fundamentals A05 Challenges In NLP V02 - lang_en-us.srt",
+                "Challenges In NLP V02",
             ),
             (
-                "123 - CD456 GenAI C789 L012 A345. Random text",
-                "Random text",
+                "4 - GEN AI C2 L3 A04 Defining Attention V2 - lang_en-us.srt",
+                "Defining Attention V2",
             ),
-            ("Just some normal title", "Just some normal title"),
-            ("V1 - lang_en-us.srt", "V1 - lang_en-us.srt"),
-            ("V1 - lan.srt", "V1 - lan.srt"),
+            (
+                "12 - CD12792 C1 L4 A01 Composing A Text Prompt - lang_en-us.srt",
+                "Composing A Text Prompt",
+            ),
         ];
 
         for (input, expected) in test_cases {

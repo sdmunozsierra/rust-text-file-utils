@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, BufReader, Write};
+use std::io::{self, BufReader};
 use std::path::Path;
 use tokio::fs::create_dir_all;
 use zip::read::ZipArchive;

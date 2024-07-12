@@ -1,3 +1,4 @@
+pub mod compound;
 pub mod file;
 pub mod parser;
 pub mod text;

@@ -2,18 +2,21 @@
 use clap::{Arg, ArgAction, Command};
 
 #[cfg(feature = "cli")]
+use crate::compound::srt_processing::process_directory;
 use crate::file::merge::merge_files;
 use crate::file::read::{read_file, read_files_sequentially};
+use crate::file::unzip::unzip_file;
 use crate::file::write::write_file;
 use crate::text::clean::clean_title;
 use crate::text::replace::replace;
 use crate::text::search::find;
 
 #[cfg(feature = "cli")]
-pub fn run_cli() {
+#[tokio::main]
+pub async fn run_cli() {
     let matches = Command::new("TextFileUtils CLI")
         .version("0.1.0")
-        .author("Your Name <youremail@example.com>")
+        .author("Your Name <ss@sergio.com.ai>")
         .about("Provides text and file utilities")
         .subcommand_required(true)
         .arg_required_else_help(true)
@@ -77,6 +80,22 @@ pub fn run_cli() {
                                 .long("content")
                                 .action(ArgAction::Set),
                         ),
+                )
+                .subcommand(
+                    Command::new("unzip")
+                        .about("Unzip a file")
+                        .arg(
+                            Arg::new("file")
+                                .help("File to unzip")
+                                .long("file")
+                                .action(ArgAction::Set),
+                        )
+                        .arg(
+                            Arg::new("directory")
+                                .help("Directory to unzip")
+                                .long("directory")
+                                .action(ArgAction::Set),
+                        ),
                 ),
         )
         .subcommand(
@@ -126,6 +145,15 @@ pub fn run_cli() {
                                 .long("text")
                                 .action(ArgAction::Set),
                         ),
+                ),
+        )
+        .subcommand(
+            Command::new("flatten_srt_directory")
+                .about("Flatten a directory")
+                .arg(
+                    Arg::new("directory")
+                        .help("Directory to flatten")
+                        .action(ArgAction::Set),
                 ),
         )
         .get_matches();
@@ -184,6 +212,14 @@ pub fn run_cli() {
                     Err(e) => eprintln!("Error writing file: {}", e),
                 }
             }
+            Some(("unzip", unzip_matches)) => {
+                let file = unzip_matches.get_one::<String>("file").unwrap();
+                let directory = unzip_matches.get_one::<String>("directory").unwrap();
+                match unzip_file(file, directory).await {
+                    Ok(_) => println!("Unzip successful!"),
+                    Err(e) => eprintln!("Error unzipping file: {}", e),
+                }
+            }
             _ => eprintln!("Unknown file operation"),
         },
         Some(("text", text_matches)) => match text_matches.subcommand() {
@@ -220,6 +256,10 @@ pub fn run_cli() {
             }
             _ => eprintln!("Unknown text operation"),
         },
+        Some(("flatten_srt_directory", sub_m)) => {
+            let directory = sub_m.get_one::<String>("directory").unwrap();
+            process_directory(directory);
+        }
         _ => eprintln!("Unknown command"),
     }
 }
