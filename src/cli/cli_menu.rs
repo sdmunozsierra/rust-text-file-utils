@@ -6,6 +6,7 @@ use crate::compound::srt_processing::process_directory;
 use crate::file::merge::merge_files;
 use crate::file::read::{read_file, read_files_sequentially};
 use crate::file::unzip::unzip_file;
+use crate::file::zip::zip_files;
 use crate::file::write::write_file;
 use crate::text::clean::clean_title;
 use crate::text::replace::replace;
@@ -94,6 +95,23 @@ pub async fn run_cli() {
                             Arg::new("directory")
                                 .help("Directory to unzip")
                                 .long("directory")
+                                .action(ArgAction::Set),
+                        ),
+                )
+                .subcommand(
+                    Command::new("zip")
+                        .about("Zip files")
+                        .arg(
+                            Arg::new("files")
+                                .help("Files to zip")
+                                .long("files")
+                                .num_args(1..)
+                                .action(ArgAction::Set),
+                        )
+                        .arg(
+                            Arg::new("path")
+                                .help("Path to place zip file")
+                                .long("path")
                                 .action(ArgAction::Set),
                         ),
                 ),
@@ -218,6 +236,18 @@ pub async fn run_cli() {
                 match unzip_file(file, directory).await {
                     Ok(_) => println!("Unzip successful!"),
                     Err(e) => eprintln!("Error unzipping file: {}", e),
+                }
+            }
+            Some(("zip", zip_matches)) => {
+                let files: Vec<_> = zip_matches
+                .get_many::<String>("files")
+                .expect("contains_id")
+                .map(|s| s.as_str())
+                .collect();
+                let path = zip_matches.get_one::<String>("path").unwrap();
+                match zip_files(files, path).await {
+                    Ok(_) => println!("Zip successful!"),
+                    Err(e) => eprintln!("Error zipping file: {}", e),
                 }
             }
             _ => eprintln!("Unknown file operation"),
