@@ -2,6 +2,9 @@
 use clap::{Arg, ArgAction, Command};
 
 #[cfg(feature = "cli")]
+use std::time::Instant;            
+
+#[cfg(feature = "cli")]
 use crate::compound::srt_processing::process_directory;
 use crate::file::merge::merge_files;
 use crate::file::read::{read_file, read_files_sequentially};
@@ -242,24 +245,34 @@ pub async fn run_cli() {
                 }
             }
             Some(("unzip", unzip_matches)) => {
+                let start_time = Instant::now();  // Start the timer
+            
                 let file = unzip_matches.get_one::<String>("file").unwrap();
                 let directory = unzip_matches.get_one::<String>("directory").unwrap();
                 match unzip_file(file, directory).await {
                     Ok(_) => println!("Unzip successful!"),
                     Err(e) => eprintln!("Error unzipping file: {}", e),
                 }
+            
+                let duration = start_time.elapsed();  // Calculate the elapsed time
+                println!("Unzip operation took: {:?}", duration);
             }
             Some(("zip", zip_matches)) => {
+                let start_time = Instant::now();  // Start the timer
+            
                 let files: Vec<_> = zip_matches
-                .get_many::<String>("files")
-                .expect("contains_id")
-                .map(|s| s.as_str())
-                .collect();
+                    .get_many::<String>("files")
+                    .expect("contains_id")
+                    .map(|s| s.as_str())
+                    .collect();
                 let path = zip_matches.get_one::<String>("path").unwrap();
                 match zip_files(files, path).await {
                     Ok(_) => println!("Zip successful!"),
                     Err(e) => eprintln!("Error zipping file: {}", e),
                 }
+            
+                let duration = start_time.elapsed();  // Calculate the elapsed time
+                println!("Zip operation took: {:?}", duration);
             }
             Some(("zipinfo", zipinfo_matches)) => {
                 let file = zipinfo_matches.get_one::<String>("file").unwrap();
