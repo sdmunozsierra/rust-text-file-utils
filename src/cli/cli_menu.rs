@@ -6,6 +6,7 @@ use std::time::Instant;
 
 #[cfg(feature = "cli")]
 use crate::compound::srt_processing::process_directory;
+use crate::file::json::load_json_file;
 use crate::file::merge::merge_files;
 use crate::file::read::{read_file, read_files_sequentially};
 use crate::file::unzip::unzip_file;
@@ -25,6 +26,20 @@ pub async fn run_cli() {
         .about("Provides text and file utilities")
         .subcommand_required(true)
         .arg_required_else_help(true)
+        .subcommand(
+            Command::new("json")
+                .about("Json operations")
+                .subcommand(
+                    Command::new("read")
+                        .about("Read json filw")
+                        .arg(
+                            Arg::new("path")
+                                .help("Path of json file to read")
+                                .long("path")
+                                .action(ArgAction::Set),
+                        )
+                    ),
+                )
         .subcommand(
             Command::new("file")
                 .about("File operations")
@@ -128,8 +143,8 @@ pub async fn run_cli() {
                                 .long("file")
                                 .action(ArgAction::Set),
                         )
-                ),
-        )
+                )
+            )
         .subcommand(
             Command::new("text")
                 .about("Text operations")
@@ -178,7 +193,7 @@ pub async fn run_cli() {
                                 .action(ArgAction::Set),
                         ),
                 ),
-        )
+            )
         .subcommand(
             Command::new("flatten_srt_directory")
                 .about("Flatten a directory")
@@ -191,6 +206,19 @@ pub async fn run_cli() {
         .get_matches();
 
     match matches.subcommand() {
+        Some(("json", json_matches)) => match json_matches.subcommand() {
+            Some(("read", read_matches)) => {
+                if read_matches.contains_id("path") {
+                    let file = read_matches.get_one::<String>("path").unwrap();
+                    println!("Reading file: {}", file);
+                    match load_json_file(file) {
+                        Ok(v) => println!("Json file read successfully:\n{}", v),
+                        Err(e) => eprintln!("Error reading json file: {}", e),
+                    }
+                }
+            }
+            _ => eprintln!("Unknown json operation"),
+        },
         Some(("file", file_matches)) => match file_matches.subcommand() {
             Some(("merge", merge_matches)) => {
                 let files: Vec<_> = merge_matches

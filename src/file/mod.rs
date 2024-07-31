@@ -1,3 +1,4 @@
+pub mod json;
 pub mod merge;
 pub mod read;
 pub mod unzip;
