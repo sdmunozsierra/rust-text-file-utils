@@ -7,6 +7,7 @@ use crate::file::merge::merge_files;
 use crate::file::read::{read_file, read_files_sequentially};
 use crate::file::unzip::unzip_file;
 use crate::file::zip::zip_files;
+use crate::file::zipinfo::get_zip_info;
 use crate::file::write::write_file;
 use crate::text::clean::clean_title;
 use crate::text::replace::replace;
@@ -114,6 +115,16 @@ pub async fn run_cli() {
                                 .long("path")
                                 .action(ArgAction::Set),
                         ),
+                )
+                .subcommand(
+                    Command::new("zipinfo")
+                        .about("Zip information")
+                        .arg(
+                            Arg::new("file")
+                                .help("File to get zip information")
+                                .long("file")
+                                .action(ArgAction::Set),
+                        )
                 ),
         )
         .subcommand(
@@ -248,6 +259,13 @@ pub async fn run_cli() {
                 match zip_files(files, path).await {
                     Ok(_) => println!("Zip successful!"),
                     Err(e) => eprintln!("Error zipping file: {}", e),
+                }
+            }
+            Some(("zipinfo", zipinfo_matches)) => {
+                let file = zipinfo_matches.get_one::<String>("file").unwrap();
+                match get_zip_info(file){
+                    Ok(v) => println!("{}", v),
+                    Err(e) => eprintln!("Error getting zip information for file: {}", e),
                 }
             }
             _ => eprintln!("Unknown file operation"),
