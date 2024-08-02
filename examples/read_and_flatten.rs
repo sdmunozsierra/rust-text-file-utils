@@ -1,5 +1,5 @@
-use rust_text_file_utils::file::{merge, read, write};
-use rust_text_file_utils::text::{flatten, replace, search};
+use rust_text_file_utils::file::read;
+use rust_text_file_utils::text::flatten;
 
 fn main() {
     let test_path = "/home/adminlenovo/Data/Programming/rust-srt-extractor/concatenated_text.txt";

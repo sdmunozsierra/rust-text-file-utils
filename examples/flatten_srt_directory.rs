@@ -13,7 +13,7 @@ fn main() {
         Ok(contents) => {
             for (filename, content) in contents {
                 let clean_filename = clean_title(filename.as_str());
-                println!("## {}", clean_filename);
+                println!("## {:?}", clean_filename);
                 // Parse each SRT file content
                 match srt::parse_srt(&content, OutputFormat::TextOnly) {
                     Ok(subtitles) => {
