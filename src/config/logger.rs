@@ -8,7 +8,7 @@ static INIT: OnceLock<()> = OnceLock::new();
 pub fn init_logging() {
     INIT.get_or_init(|| {
         let mut clog = colog::default_builder();
-        clog.filter(None, log::LevelFilter::Info);
+        clog.filter(None, log::LevelFilter::Debug);
         clog.init();
     });
 }

@@ -2,7 +2,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use tokio::task;
-use log::{error, info, debug};
+use log::{error, warn, info, debug};
 
 use crate::config::logger;
 
@@ -28,7 +28,10 @@ pub async fn unzip_file(zip_path: &str, dest_dir: &str) -> io::Result<()> {
                     full_path = full_path.components().collect::<PathBuf>();
                     full_path
                 }
-                None => continue,
+                None => {
+                    warn!("Encountered a None value for file name!");
+                    continue;
+                }
             };
 
             if file.is_dir() {

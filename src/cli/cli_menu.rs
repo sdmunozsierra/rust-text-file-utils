@@ -13,7 +13,7 @@ use crate::file::unzip::unzip_file;
 use crate::file::zip::zip_files;
 use crate::file::zipinfo::get_zip_info;
 use crate::file::write::write_file;
-use crate::text::clean::clean_title;
+use crate::text::clean::{clean_title, TitleFormat};
 use crate::text::replace::replace;
 use crate::text::search::find;
 
@@ -196,10 +196,23 @@ pub async fn run_cli() {
             )
         .subcommand(
             Command::new("flatten_srt_directory")
-                .about("Flatten a directory")
+                .about("Flatten a srt directory")
                 .arg(
                     Arg::new("directory")
-                        .help("Directory to flatten")
+                        .help("SRT Directory to flatten")
+                        .long("directory")
+                        .action(ArgAction::Set),
+                )
+                .arg(
+                    Arg::new("chapter")
+                        .help("Current chapter")
+                        .long("chapter")
+                        .action(ArgAction::Set),
+                )
+                .arg(
+                    Arg::new("name")
+                        .help("Name of the chapter")
+                        .long("name")
                         .action(ArgAction::Set),
                 ),
         )
@@ -315,7 +328,7 @@ pub async fn run_cli() {
             Some(("clean_title", clean_matches)) => {
                 let input = clean_matches.get_one::<String>("input").unwrap();
                 println!("Cleaning text: {}", input);
-                match clean_title(input) {
+                match clean_title(input, TitleFormat::Default) {
                     Ok(v) => println!("{}", v),
                     Err(e) => eprintln!("Error cleaning title: {}", e),
                 }
@@ -347,7 +360,10 @@ pub async fn run_cli() {
         },
         Some(("flatten_srt_directory", sub_m)) => {
             let directory = sub_m.get_one::<String>("directory").unwrap();
-            process_directory(directory);
+            let chapter_str = sub_m.get_one::<String>("chapter").unwrap();
+            let chapter: i32 = chapter_str.parse().expect("Failed to parse chapter as integer");
+            let name = sub_m.get_one::<String>("name").unwrap();
+            process_directory(directory, chapter, name);
         }
         _ => eprintln!("Unknown command"),
     }

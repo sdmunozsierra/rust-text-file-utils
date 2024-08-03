@@ -1,4 +1,13 @@
 use regex::Regex;
+use log::{error, debug}; 
+
+use crate::config::logger;
+
+// Initialize logging for the entire module
+#[ctor::ctor]
+fn init() {
+    logger::init_logging();
+}
 
 #[derive(Debug, PartialEq)]
 pub struct Subtitle {
@@ -32,13 +41,17 @@ pub fn parse_srt(srt_content: &str, format: OutputFormat) -> Result<Vec<Subtitle
             line.parse::<usize>()
                 .map_err(|e| format!("Invalid sequence number: {}", e))?
         } else {
-            return Err(format!("Invalid sequence format: {}", line));
+            let error_messages = format!("Invalid sequence format: {}", line);
+            error!("{}", error_messages);
+            return Err(error_messages);
         };
 
-        // Skip the empty line before the timestamp
-        lines
-            .next()
-            .ok_or("Expected a blank line before the timestamp but found none")?;
+        // Optionally skip an empty line if present
+        if let Some(next_line) = lines.peek() {
+            if next_line.trim().is_empty() {
+                lines.next(); // Consume the empty line
+            }
+        }
 
         // Parse timestamp
         let timestamp_line = lines.next().ok_or("Missing timestamp line")?;
@@ -59,6 +72,12 @@ pub fn parse_srt(srt_content: &str, format: OutputFormat) -> Result<Vec<Subtitle
             text.push('\n');
         }
         text = text.trim_end().to_string(); // Remove trailing newline
+
+        // Log the parsed subtitle details
+        debug!(
+            "Parsed subtitle: sequence={}, start={}, end={}, text={:?}",
+            sequence, start, end, text
+        );
 
         let subtitle = match format {
             OutputFormat::Full => Subtitle {

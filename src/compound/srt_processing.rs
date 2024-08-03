@@ -1,18 +1,27 @@
 use crate::file::read::read_files_sequentially;
 use crate::parser::srt::{self, OutputFormat};
-use crate::text::clean::clean_title;
+use crate::text::clean::{TitleFormat, clean_title};
 use crate::text::flatten::flatten_text;
+use log::{debug, error};
 
-pub fn process_directory(directory: &str) {
+use crate::config::logger;
+
+
+pub fn process_directory(directory: &str, index_number: i32, name: &str) {
+    logger::init_logging();
+
+    let chapter: String = index_number.to_string();
+    let mut file_number: i32 = 1;
+
     // Read all SRT files in the specified directory
-    let result = read_files_sequentially(directory, "srt");
-    match result {
+    println!("# {}", name);
+    match read_files_sequentially(directory, "srt") {
         Ok(contents) => {
-            let mut file_number = 1;
             for (filename, content) in contents {
-                match clean_title(filename.as_str()) {
+                match clean_title(filename.as_str(), TitleFormat::SmartIgnore3) {
                     Ok(clean_filename) => {
-                        println!("## 4.{} {}", file_number, clean_filename);
+                        debug!("Processing file: {}", filename);
+                        println!("## {}.{} {}", chapter, file_number, clean_filename);
                         // Increment the file number
                         file_number += 1;
                         // Parse each SRT file content
@@ -25,13 +34,13 @@ pub fn process_directory(directory: &str) {
                                 let flatten = flatten_text(&subtitle_texts.join("\n"));
                                 println!("{}\n", flatten);
                             }
-                            Err(e) => eprintln!("Failed to parse SRT content: {}", e),
+                            Err(e) => error!("Failed to parse SRT content from '{}': {}", filename, e),
                         }
                     }
-                    Err(e) => eprintln!("Failed to clean filename: {}", e),
+                    Err(e) => error!("Failed to clean filename '{}': {}", filename, e),
                 }
             }
         }
-        Err(e) => eprintln!("Failed to read files: {}", e),
+        Err(e) => error!("Failed to read files from directory '{}': {}", directory, e),
     }
 }
